@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: debbie-app-deployment
+  namespace: masterclass
+  labels:
+    app: debbie-app
+spec:
+  strategy:
+    type: Recreate
+  replicas: 2
+  selector:
+    matchLabels:
+      app: debbie-app
+  template:
+    metadata:
+      labels:
+        app: debbie-app
+    spec:
+      containers:
+        - name: debbie-app
+          image: riyanatshittu/my-k8s-masterclass-springboot-app:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: / # replace with /actuator/health once you connect to db
+              port: 8080
+            initialDelaySeconds: 60
+          readinessProbe:
+            httpGet:
+              path: / # replace with /actuator/health once you connect to db
+              port: 8080
+            initialDelaySeconds: 60
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "200m"
+            limits:
+              memory: "512Mi"
+              cpu: "250m"
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: debbie-configmap
+                  key: db_url
+            - name: DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: debbie-secret
+                  key: db_user
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: debbie-secret
+                  key: db_pass

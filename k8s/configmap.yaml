@@ -1,0 +1,9 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: debbie-configmap
+  namespace: masterclass
+  labels:
+    app: debbie-configmap
+data:
+  db_url: jdbc:postgresql://10.1.3.192:5432/db0
